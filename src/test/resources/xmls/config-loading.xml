@@ -1,0 +1,14 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	">
+    <import resource="config-props.xml"/>
+    <import resource="classpath:${spring.profiles.active}/config-new-rabbit.xml"/>
+    <import resource="config-redis3.xml"/>
+    <import resource="classpath:${spring.profiles.active}/config-cassandra.xml"/>
+    <import resource="config-server.xml" />
+    <import resource="i18n.xml" />
+    <import resource="metric.xml" />
+    <import resource="classpath:${spring.profiles.active}/jmx.xml"/>
+
+</beans>

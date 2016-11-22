@@ -1,0 +1,48 @@
+目录：
+/opt/faceshow/bizServer/logs/behaviour.log
+
+通用字段：
+nodId|ip|bizServer|时间(格式化)|时间(未格式化)|action|userId|receiver|sessionId|ip|channelUuid|channelMode|定制字段
+
+1 登录
+  通用字段: action为login
+  定制字段 countryCode|channelMode|networkType
+  i.e
+  2015-03-26 07:31:09.305|1427355069305|login||||93.168.146.24|120f7a2ad38a11e48ffc06f730213293|1|0966|1
+
+2 登出(切换通道模式)
+  通用字段: action为logout
+  定制字段 countryCode|channelMode 如果channelMode为空，则表示退出（非切换通道模式）|networkType
+  i.e
+  2015-03-26 07:31:09.324|1427355069324|logout|f0ada210d01111e49ee92d4d7119e05f||a1e66433bee34b9fb2f4bfa7f9e46790|188.140.173.234|8c973562d38a11e4b4ca0696292be5be|1|0966|
+
+3 call(包括呼叫请求、呼叫接受到、呼叫拒绝、呼叫接听、呼叫挂断)
+  通用字段: action为call
+  定制字段 status（见下文描述）|sub_status（见下文描述）|traceId|roomId|countryCode(指令发送方用户的国家码)|networkType
+
+  status取值：
+  1：视频请求； 2： 视频接听 ；3：拒绝 ；4： 挂断 ；6： 接受到 ；7：忙 ；10：接听确认；17： 语音请求 ；18； 语音接听 ；
+
+  sub_status: 当status为 4（挂断）时，1：未接通挂断（未超时），2：接通中挂断；3：未接通挂断（超时）
+
+  i.e
+  2015-03-26 07:37:29.252|1427355449252|call|5b31e630d0e211e39bc3abf93b119073|e68f3380d2cd11e39bc3abf93b119073|41cf42059cf343a19c72cdce824f5b83|180.110.4.193|50de69ced38911e4929f021e0ad8a72d|1|1||f44d9d86d38a11e4bacb021e0ad8a72d|call_763d64c6471f4c608cfda2fe704763d64c6471f4c608cfda2fe70479469
+
+  2015-03-26 07:32:36.465|1427355156465|call|1252ae909bb211e4875c8d8d78252756|dc7fac60d02c11e3a4f9abf93b119073|45b0e22b63104496acd5d217e9826a46|180.110.4.193|f4037982d38911e4929f021e0ad8a72d|1|3||4633ba5ad38a11e49e27021e0ad8a72d|call_1db0b885078a4de6a664758f5d81db0b885078a4de6a664758f5d881dfe
+
+  2015-03-26 07:37:46.057|1427355466057|call|5b31e630d0e211e39bc3abf93b119073|e68f3380d2cd11e39bc3abf93b119073|41cf42059cf343a19c72cdce824f5b83|180.110.4.193|50de69ced38911e4929f021e0ad8a72d|1|4|3|febb919cd38a11e4bacb021e0ad8a72d|call_763d64c6471f4c608cfda2fe704763d64c6471f4c608cfda2fe70479469
+
+4 发送消息包括(文本、图片、语音文件)
+  通用字段： action为text、pic、audio_msg
+  定制字段：cmsgId(客户端消息id)|msgFlag(是否重发 1：重发；其它取值表示非重发)|content_size(消息内容长度)|countryCode(发送方用户的国家码)|networkType
+
+  i.e
+  2015-03-26 07:20:53.231|1427354453231|text|c4ca4238a0b923820dcc509a6f75849b|eccbc87e4b5ce2fe28308fd9f2a7baf3|cfcd208495d565ef66e7dff9f98764da|180.110.4.193|9df84ed8d38811e4966e02b3485bd66f|1|1427354453.19|0
+
+5 系统通知
+  通用字段：action为notify
+  定制字段：msgType|serverType|cmsgId|traceId|networkType
+
+  i.e
+  2015-03-26 07:21:47.056|1427354507056|notify|eccbc87e4b5ce2fe28308fd9f2a7baf3|c81e728d9d4c2f636f067f89cc14862c|c81e728d9d4c2f636f067f89cc14862c|180.110.4.193|74416164d38911e4b4ca0696292be5be|1|2|1|eccbc87e4b5ce2fe28308fd9f2a7baf3_1427354505.88|74b7b0b2d38911e4a2860696292be5be
+

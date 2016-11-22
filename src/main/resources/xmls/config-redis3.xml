@@ -1,0 +1,40 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
+
+    <bean id="pConfig" class="redis.clients.jedis.JedisPoolConfig">
+        <property name="maxTotal" value="${redis.pool.maxTotal}"/>
+        <property name="maxIdle" value="${redis.pool.maxIdle}"/>
+        <property name="minIdle" value="${redis.pool.minIdle}"/>
+        <property name="testWhileIdle" value="${redis.pool.testWhileIdle}"/>
+        <property name="testOnBorrow" value="${redis.pool.testOnBorrow}"/>
+        <property name="testOnReturn" value="${redis.pool.testOnReturn}"/>
+        <property name="testOnCreate" value="${redis.pool.testOnCreate}"/>
+        <property name="numTestsPerEvictionRun" value="${redis.pool.numTestsPerEvictionRun}"/>
+        <property name="softMinEvictableIdleTimeMillis" value="${redis.pool.softMinEvictableIdleTimeMillis}"/>
+        <property name="minEvictableIdleTimeMillis" value="${redis.pool.minEvictableIdleTimeMillis}"/>
+        <property name="timeBetweenEvictionRunsMillis" value="${redis.pool.timeBetweenEvictionRunsMillis}"/>
+        <property name="maxWaitMillis" value="${redis.pool.maxWaitMillis}"/>
+        <property name="blockWhenExhausted" value="${redis.pool.blockWhenExhausted}"/>
+    </bean>
+
+    <bean id="binaryJedisCluster" class="com.handwin.redis.BinaryJedisCluster">
+        <constructor-arg index="0" type="java.lang.String">
+            <value>${redis.hosts}</value>
+        </constructor-arg>
+        <!-- timeout  -->
+        <constructor-arg index="1" >
+            <value>1000</value>
+        </constructor-arg>
+        <!-- max redirection -->
+        <constructor-arg index="2" >
+            <value>5</value>
+        </constructor-arg>
+        <constructor-arg index="3" type="redis.clients.jedis.JedisPoolConfig">
+            <ref bean="pConfig"></ref>
+        </constructor-arg>
+    </bean>
+
+</beans>

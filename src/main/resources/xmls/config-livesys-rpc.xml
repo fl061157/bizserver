@@ -1,0 +1,26 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
+
+    <bean id="liveSysRpcMrConnectionManager" class="cn.v5.rpc.cluster.MRClusterConnectionManagerSpring">
+        <property name="group" value="${zk.group.livesys}"/>
+        <property name="discoverURL" value="${zk.address}"/>
+        <property name="executor" ref="mrServerExecutor"/>
+        <property name="clusterType" value="rpcServer"/>
+    </bean>
+
+    <bean id="liveChatMessageHandler" class="com.handwin.server.controller.livechat.LiveChatMessageHandler"/>
+
+    <bean name="exportLiveSysMessageService" class="cn.v5.rpc.MRMessagePackInvokerServiceExporter">
+        <property name="serviceUrl" value="rpc/livesysmsg"/>
+        <property name="service" ref="liveChatMessageHandler"/>
+        <property name="serviceInterface" value="com.handwin.api.sysmsg.service.LiveSysMessageService"/>
+        <property name="messagePack" ref="messagePack"/>
+        <property name="connectionManager" ref="liveSysRpcMrConnectionManager"/>
+        <property name="rpcServiceManager" ref="rpcServiceManager"/>
+        <property name="perfetchSize" value="512"/>
+        <property name="registry" ref="metrics"/>
+    </bean>
+
+</beans>

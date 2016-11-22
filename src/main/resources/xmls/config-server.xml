@@ -1,0 +1,44 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:cache="http://www.springframework.org/schema/cache"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/cache
+		http://www.springframework.org/schema/cache/spring-cache.xsd">
+
+    <bean id="systemConfigBean" class="com.handwin.config.SystemConfigBean">
+        <property name="ipStrategyUrl" value="${ip.strategy.server.url}"/>
+        <property name="ipStrategyUdpPath" value="${ip.strategy.server.udp.path}"></property>
+        <property name="udpIpDefault" value="${ip.strategy.udp.ip.default}"></property>
+        <property name="udpPortDefaul" value="${ip.strategy.udp.port.default}"></property>
+        <property name="udpNodeDefault" value="${ip.strategy.udp.node.default}"></property>
+        <property name="udpP2pDefault" value="${ip.strategy.udp.p2p.default}"></property>
+        <property name="ipStrategyTcpPath" value="${ip.strategy.server.tcp.path}"/>
+        <property name="traversingServerPath" value="${ip.strategy.server.traversing.server.path}"/>
+    </bean>
+
+
+    <bean id="cacheManagerFactory"
+          class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+        <property name="configLocation" value="classpath:xmls/ehcache.xml"/>
+    </bean>
+
+    <!-- 支持缓存注解 -->
+    <cache:annotation-driven cache-manager="cacheManager"/>
+
+
+    <!-- 默认是cacheManager -->
+    <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager">
+        <property name="cacheManager" ref="cacheManagerFactory"/>
+    </bean>
+
+
+    <!--<bean id="environment" class="reactor.spring.factory.EnvironmentFactoryBean">-->
+
+    <!--</bean>-->
+
+    <!--<bean id="reactor" class="reactor.spring.factory.ReactorFactoryBean">-->
+    <!--<constructor-arg ref="environment"/>-->
+    <!--</bean>-->
+
+</beans>

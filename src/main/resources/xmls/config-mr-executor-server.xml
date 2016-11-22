@@ -1,0 +1,13 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
+
+    <bean id="mrServerExecutor" class="com.handwin.mq.BlockingThreadPoolExecutor">
+        <constructor-arg index="0" value="50"/>
+        <constructor-arg index="1" value="100"/>
+        <constructor-arg index="2" value="0"/>
+        <constructor-arg index="3" value="10000"/>
+    </bean>
+
+</beans>

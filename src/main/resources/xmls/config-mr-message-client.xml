@@ -1,0 +1,47 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+    <!-- Repeat TODO  是否 需要合并 ? -->
+    <context:component-scan base-package="cn.v5.mr,cn.v5.rpc"/>
+
+
+    <bean id="messageConnectionManager" class="cn.v5.rpc.cluster.MRClusterConnectionManagerSpring">
+        <property name="group" value="${zk.group.message}"/>
+        <property name="discoverURL" value="${zk.address}"/>
+        <property name="executor" ref="mrClientExecutor"/>
+        <property name="clusterType" value="rpcClient"/>
+    </bean>
+
+    <bean id="messagePublisher" class="cn.v5.mr.MRPublisherFactoryBean">
+        <property name="connectionManager" ref="messageConnectionManager"/>
+        <property name="priority" value="1" />
+    </bean>
+
+    <bean id="messageRpcClient" class="cn.v5.rpc.RpcClient">
+        <constructor-arg ref="messagePack"/>
+        <constructor-arg ref="messagePublisher"/>
+        <constructor-arg ref="mrClientExecutor"/>
+        <constructor-arg value="20"/>
+        <constructor-arg ref="metrics"/>
+    </bean>
+
+
+    <bean id="rpcMessageService" class="cn.v5.rpc.MRMessagePackInvokerProxyFactoryBean">
+        <property name="serviceUrl" value="rpc/message"/>
+        <property name="serviceInterface" value="com.handwin.message.service.MessageService"/>
+        <property name="rpcClient" ref="messageRpcClient"/>
+    </bean>
+
+    <bean id="rpcMessageServiceAsync" class="cn.v5.rpc.MRMessagePackInvokerProxyFactoryBean">
+        <property name="serviceUrl" value="rpc/message"/>
+        <property name="serviceInterface" value="com.handwin.message.service.MessageServiceAsync"/>
+        <property name="rpcClient" ref="messageRpcClient"/>
+    </bean>
+
+
+</beans>

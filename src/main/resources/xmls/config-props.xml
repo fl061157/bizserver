@@ -1,0 +1,51 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-3.2.xsd
+	    http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+
+    <bean id="configproperties"
+          class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="locations">
+            <list>
+                <value>classpath:${spring.profiles.active}/config-redis.properties</value>
+                <value>classpath:${spring.profiles.active}/config-server.properties</value>
+                <value>classpath:${spring.profiles.active}/config-rabbitmq.properties</value>
+                <value>classpath:${spring.profiles.active}/config-cassandra.properties</value>
+                <value>classpath:${spring.profiles.active}/config-message.properties</value>
+                <value>classpath:${spring.profiles.active}/config-live.properties</value>
+                <value>classpath:${spring.profiles.active}/config-sms.properties</value>
+                <value>classpath:${spring.profiles.active}/config-zookeeper.properties</value>
+                <value>classpath:common.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="propertyConfigurer"
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="properties" ref="configproperties"/>
+    </bean>
+
+    <task:executor id="taskExecutor" pool-size="2-4" queue-capacity="50000"
+                   rejection-policy="DISCARD"/>
+
+    <!-- 启动 Message消息配置 -->
+    <!--<bean class="com.handwin.message.MessageConfiguration">-->
+    <!--</bean>-->
+
+    <bean id="objectMapper" name="objectMapper" class="com.handwin.json.ObjectMapperFactoryBean"/>
+
+    <task:annotation-driven/>
+
+    <task:executor id="executorInterBizServers" pool-size="5" queue-capacity="10000"
+                   rejection-policy="CALLER_RUNS"/>
+
+
+    <context:component-scan base-package="com.handwin"/>
+
+
+</beans>

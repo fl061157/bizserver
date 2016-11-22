@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:metrics="http://www.ryantenney.com/schema/metrics"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+           http://www.ryantenney.com/schema/metrics
+           http://www.ryantenney.com/schema/metrics/metrics-3.0.xsd">
+
+    <!-- Registry should be defined in only one context XML file -->
+    <bean id="exporter" class="org.springframework.jmx.export.MBeanExporter">
+        <property name="assembler" ref="assembler"/>
+        <property name="namingStrategy" ref="namingStrategy"/>
+        <property name="autodetect" value="true"/>
+    </bean>
+
+    <bean id="jmxAttributeSource"
+          class="org.springframework.jmx.export.annotation.AnnotationJmxAttributeSource"/>
+
+    <!-- will create management interface using annotation metadata -->
+    <bean id="assembler"
+          class="org.springframework.jmx.export.assembler.MetadataMBeanInfoAssembler">
+        <property name="attributeSource" ref="jmxAttributeSource"/>
+    </bean>
+
+    <!-- will pick up the ObjectName from the annotation -->
+    <bean id="namingStrategy"
+          class="org.springframework.jmx.export.naming.MetadataNamingStrategy">
+        <property name="attributeSource" ref="jmxAttributeSource"/>
+    </bean>
+
+    <metrics:metric-registry id="metric"/>
+
+    <!-- annotation-driven must be included in all context files -->
+    <metrics:annotation-driven metric-registry="metric"/>
+
+    <!--&lt;!&ndash; (Optional) Registry should be defined in only one context XML file &ndash;&gt;-->
+    <!--<metrics:reporter type="console" metric-registry="metric" period="1m"/>-->
+
+    <metrics:reporter type="jmx" metric-registry="metric"/>
+
+    <!--<metrics:reporter type="slf4j" metric-registry="metric" period="60s" logger="com.metrics" marker="foobar" rate-unit="MINUTES" duration-unit="MICROSECONDS" />-->
+
+    <!--<metrics:reporter id="graphite" type="graphite" metric-registry="metric" period="100ms" host="192.168.1.40"-->
+                      <!--port="2003" charset="utf8" prefix="192.168.31.94-metrics-test" rate-unit="DAYS"-->
+                      <!--duration-unit="HOURS"/>-->
+    <!--<metrics:reporter id="graphite-tcp" type="graphite" metric-registry="metrics" transport="tcp" period="100ms" host="localhost" port="6666" charset="ISO-8859-1" prefix="metrics-test" clock-ref="mockClock" filter-ref="filter" rate-unit="DAYS" duration-unit="HOURS" />-->
+    <!--<metrics:reporter id="graphite-udp" type="graphite" metric-registry="metrics" transport="udp" period="100ms" host="localhost" port="6666" charset="ISO-8859-1" prefix="metrics-test" clock-ref="mockClock" filter-ref="filter" rate-unit="DAYS" duration-unit="HOURS" />-->
+    <!--<metrics:reporter id="graphite-pickle" type="graphite" metric-registry="metrics" transport="pickle" period="100ms" host="localhost" port="6666" batch-size="200" charset="ISO-8859-1" prefix="metrics-test" clock-ref="mockClock" filter-ref="filter" rate-unit="DAYS" duration-unit="HOURS" />-->
+    <!--<metrics:reporter id="graphite-rabbitmq" type="graphite" metric-registry="metrics" transport="rabbitmq" period="100ms" connection-factory-ref="mockConnectionFactory" exchange="exchange" prefix="metrics-test" clock-ref="mockClock" filter-ref="filter" rate-unit="DAYS" duration-unit="HOURS" />-->
+
+
+    <metrics:register metric-registry="metric">
+        <bean metrics:name="jvm.gc" class="com.codahale.metrics.jvm.GarbageCollectorMetricSet"/>
+        <bean metrics:name="jvm.memory" class="com.codahale.metrics.jvm.MemoryUsageGaugeSet"/>
+        <bean metrics:name="jvm.thread-states" class="com.codahale.metrics.jvm.ThreadStatesGaugeSet"/>
+        <bean metrics:name="jvm.fd.usage" class="com.codahale.metrics.jvm.FileDescriptorRatioGauge"/>
+    </metrics:register>
+
+</beans>

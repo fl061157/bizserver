@@ -1,0 +1,84 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		"
+        >
+
+    <bean id="basicEntityManager"
+          class="com.handwin.cassandra.PersistenceManagerFactoryBean">
+        <property name="entityPackages" value="com.handwin.entity"/>
+        <property name="contactPoints" value="${cassandra.host}"/>
+        <property name="port" value="${cassandra.port}"/>
+        <property name="keyspaceName" value="${cassandra.keyspace}"/>
+        <property name="objectMapper" ref="objectMapper"/>
+        <property name="consistencyLevelReadDefault" value="${cassandra.consistency.read.level}"/>
+        <property name="consistencyLevelWriteDefault" value="${cassandra.consistency.write.level}"/>
+        <property name="forceTableCreation" value="true"/>
+        <property name="compression">
+            <value>LZ4</value>
+        </property>
+        <property name="loadBalancingPolicy">
+            <bean class="com.datastax.driver.core.policies.TokenAwarePolicy">
+                <constructor-arg>
+                    <bean class="com.datastax.driver.core.policies.DCAwareRoundRobinPolicy">
+                        <constructor-arg value="us-west-2"/>
+                    </bean>
+                </constructor-arg>
+            </bean>
+        </property>
+    </bean>
+
+
+    <bean id="bizEntityManager"
+          class="com.handwin.cassandra.PersistenceManagerFactoryBean">
+        <property name="entityPackages" value="com.handwin.localentity"/>
+        <property name="contactPoints" value="${cassandra.host}"/>
+        <property name="port" value="${cassandra.port}"/>
+        <property name="keyspaceName" value="${cassandra.keyspace.local}"/>
+        <property name="objectMapper" ref="objectMapper"/>
+        <property name="consistencyLevelReadDefault" value="${cassandra.consistency.read.level}"/>
+        <property name="consistencyLevelWriteDefault" value="${cassandra.consistency.write.level}"/>
+        <property name="forceTableCreation" value="true"/>
+        <property name="compression">
+            <value>LZ4</value>
+        </property>
+        <property name="loadBalancingPolicy">
+            <bean class="com.datastax.driver.core.policies.TokenAwarePolicy">
+                <constructor-arg>
+                    <bean class="com.datastax.driver.core.policies.DCAwareRoundRobinPolicy">
+                        <constructor-arg value="us-west-2"/>
+                    </bean>
+                </constructor-arg>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="opManager"
+          class="com.handwin.cassandra.PersistenceManagerFactoryBean">
+        <property name="entityPackages" value="com.handwin.entity"/>
+        <property name="contactPoints" value="${cassandra.host}"/>
+        <property name="port" value="${cassandra.port}"/>
+        <property name="keyspaceName" value="${cassandra.keyspace.op.local}"/>
+        <property name="objectMapper" ref="objectMapper"/>
+        <property name="consistencyLevelReadDefault" value="${cassandra.consistency.read.level}"/>
+        <property name="consistencyLevelWriteDefault" value="${cassandra.consistency.write.level}"/>
+        <property name="forceTableCreation" value="true"/>
+        <property name="compression">
+            <value>LZ4</value>
+        </property>
+        <property name="loadBalancingPolicy">
+            <bean class="com.datastax.driver.core.policies.TokenAwarePolicy">
+                <constructor-arg>
+                    <bean class="com.datastax.driver.core.policies.DCAwareRoundRobinPolicy">
+                        <constructor-arg value="us-west-2"/>
+                    </bean>
+                </constructor-arg>
+            </bean>
+        </property>
+    </bean>
+
+
+
+</beans>

@@ -1,0 +1,2 @@
+1 native和ascii在线转换
+http://web.chacuo.net/charsetnative

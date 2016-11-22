@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans.xsd
+         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <bean id="cnRabbitProperties" class="com.handwin.mq.RabbitProperties">
+        <property name="userName" value="${cn.rabbit.username}"></property>
+        <property name="password" value="${cn.rabbit.password}"></property>
+        <property name="addresses" value="${cn.rabbit.host}"></property>
+    </bean>
+
+    <bean id="usRabbitProperties" class="com.handwin.mq.RabbitProperties">
+        <property name="userName" value="${us.rabbit.username}"></property>
+        <property name="password" value="${us.rabbit.password}"></property>
+        <property name="addresses" value="${us.rabbit.host}"></property>
+    </bean>
+
+    <util:list id="cnPublishList">
+        <ref bean="cnRabbitProperties"/>
+    </util:list>
+
+    <util:list id="usPublishList">
+        <ref bean="usRabbitProperties"/>
+    </util:list>
+
+    <util:map id="pubRabbitProperties">
+        <entry key="0086" value-ref="cnPublishList"/>
+        <entry key="0001" value-ref="usPublishList"/>
+    </util:map>
+
+    <bean id="pubRabbitAdmin" class="com.handwin.mq.RabbitAdmin">
+        <property name="pubRegionPropertiesMap" ref="pubRabbitProperties"></property>
+    </bean>
+
+    <bean id="tcpSubRabbitAdmin" class="com.handwin.mq.RabbitAdmin">
+        <property name="subRegionProperties" ref="cnRabbitProperties"></property>
+    </bean>
+
+    <bean id="bizSubRabbitAdmin" class="com.handwin.mq.RabbitAdmin">
+        <property name="subRegionProperties" ref="cnRabbitProperties"></property>
+    </bean>
+
+    <bean id="tcpMessageListener" class="com.handwin.rabbitmq.TcpMessageHandler"/>
+    <bean id="wrongMessageListener" class="com.handwin.rabbitmq.WrongMessageListener"/>
+    <bean id="serverHeartListener" class="com.handwin.rabbitmq.ServerHeartbeatListener"/>
+    <bean id="timerMessageListener" class="com.handwin.rabbitmq.TimerMessageListener"/>
+    <bean id="v5ProtocalListener" class="com.handwin.rabbitmq.V5ProtocolHandler"/>
+
+    <util:map id="listenerMapper">
+        <entry key="${http2biz.queue}" value-ref="tcpMessageListener"/>
+        <entry key="${biz2biz.queue}" value-ref="tcpMessageListener"/>
+        <entry key="${serverheart.queue}" value-ref="serverHeartListener"/>
+        <entry key="${fail.queue}" value-ref="wrongMessageListener"/>
+        <entry key="${timer2biz.queue}" value-ref="timerMessageListener"/>
+        <entry key="${v5protocol.queue}" value-ref="v5ProtocalListener"/>
+    </util:map>
+
+    <util:map id="tcpListenerMapper">
+        <entry key="${tcp2login.queue}" value-ref="tcpMessageListener"/>
+    </util:map>
+
+
+    <bean id="tcpRabbitListenerContainer" class="com.handwin.mq.RabbitListenerContainer">
+        <property name="listenerMap" ref="tcpListenerMapper"/>
+        <property name="rabbitAdmin" ref="tcpSubRabbitAdmin"/>
+    </bean>
+
+    <bean id="bizRabbitListenerContainer" class="com.handwin.mq.RabbitListenerContainer">
+        <property name="listenerMap" ref="listenerMapper"/>
+        <property name="rabbitAdmin" ref="bizSubRabbitAdmin"/>
+    </bean>
+
+    <bean id="cnRabbitTemplate" class="com.handwin.mq.RabbitTemplate">
+        <property name="region" value="0086"/>
+        <property name="rabbitAdmin" ref="pubRabbitAdmin"/>
+    </bean>
+
+    <bean id="usRabbitTemplate" class="com.handwin.mq.RabbitTemplate">
+        <property name="region" value="0001"/>
+        <property name="rabbitAdmin" ref="pubRabbitAdmin"/>
+    </bean>
+
+
+    <util:map id="templateMapping">
+        <entry key="0086" value-ref="cnRabbitTemplate"></entry>
+        <entry key="0001" value-ref="usRabbitTemplate"></entry>
+    </util:map>
+
+    <bean id="amqpProtocolOutputTemplate" class="com.handwin.rabbitmq.AmqpProtocolOutputTemplate">
+        <property name="templates" ref="templateMapping"></property>
+        <property name="defaultCountryCode" value="${default.country.code}"/>
+        <property name="localCountryCode" value="${localidc.country.code}"/>
+    </bean>
+
+
+</beans>

@@ -1,0 +1,77 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:metrics="http://www.ryantenney.com/schema/metrics"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-3.2.xsd
+		http://www.springframework.org/schema/util
+		http://www.springframework.org/schema/util/spring-util.xsd
+        http://www.ryantenney.com/schema/metrics
+        http://www.ryantenney.com/schema/metrics/metrics.xsd">
+
+    <context:component-scan base-package="cn.v5.mr"/>
+    <context:component-scan base-package="cn.v5.rpc"/>
+
+    <bean id="rpcServiceManager" class="cn.v5.rpc.RpcServiceManager">
+    </bean>
+
+    <bean id="messagePack" class="org.msgpack.MessagePack">
+    </bean>
+
+    <bean id="tcpMessageHandler" class="com.handwin.rabbitmq.TcpMessageHandler"/>
+    <bean id="mrTcpMessageListener" class="com.handwin.mr.MessageListenerAdapter">
+        <constructor-arg ref="tcpMessageHandler"/>
+    </bean>
+
+    <bean id="mrWrongMessageHandler" class="com.handwin.rabbitmq.WrongMessageListener"/>
+    <bean id="mrWrongMessageListener" class="com.handwin.mr.MessageListenerAdapter">
+        <constructor-arg ref="mrWrongMessageHandler"/>
+    </bean>
+
+    <bean id="mrServerHeartHandler" class="com.handwin.rabbitmq.ServerHeartbeatListener"/>
+    <bean id="mrServerHeartListener" class="com.handwin.mr.MessageListenerAdapter">
+        <constructor-arg ref="mrServerHeartHandler"/>
+    </bean>
+
+
+    <bean id="mrTimerMessageHandler" class="com.handwin.rabbitmq.TimerMessageListener"/>
+    <bean id="mrTimerMessageListener" class="com.handwin.mr.MessageListenerAdapter">
+        <constructor-arg ref="mrTimerMessageHandler"/>
+    </bean>
+
+    <bean id="coreServerHandler"
+          class="com.handwin.rabbitmq.MessageFromCoreServerHandler"/>
+    <bean id="mrMessageFromCoreServerListener" class="com.handwin.mr.MessageListenerAdapter">
+        <constructor-arg ref="coreServerHandler"/>
+    </bean>
+
+
+    <util:map id="mrListenerMapper">
+        <entry key="${http2biz.queue}" value-ref="mrMessageFromCoreServerListener"/>
+        <entry key="${biz2biz.queue}" value-ref="mrTcpMessageListener"/>
+        <entry key="${serverheart.queue}" value-ref="mrServerHeartListener"/>
+        <entry key="${fail.queue}" value-ref="mrWrongMessageListener"/>
+        <entry key="${timer2biz.queue}" value-ref="mrTimerMessageListener"/>
+        <entry key="${tcp2login.queue}" value-ref="mrTcpMessageListener"/>
+    </util:map>
+
+    <bean id="mrConnectionManager" class="cn.v5.rpc.cluster.MRClusterConnectionManagerSpring">
+        <property name="group" value="${zk.group.biz}"/>
+        <property name="discoverURL" value="${zk.address}"/>
+        <property name="executor" ref="mrServerExecutor"/>
+        <property name="clusterType" value="mrBizSub"/>
+        <property name="listenerMap" ref="mrListenerMapper"/>
+        <property name="perfetchSize" value="512"/>
+    </bean>
+
+
+    <bean id="mrClusterMapClientManager" class="cn.v5.rpc.cluster.MRClusterMapClientManager">
+        <property name="discoverURL" value="${zk.address}"/>
+        <property name="executor" ref="mrClientExecutor"/>
+    </bean>
+
+
+</beans>

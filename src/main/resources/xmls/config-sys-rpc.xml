@@ -1,0 +1,28 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
+
+
+    <bean id="sysRpcMrConnectionManager" class="cn.v5.rpc.cluster.MRClusterConnectionManagerSpring">
+        <property name="group" value="${zk.group.sys}"/>
+        <property name="discoverURL" value="${zk.address}"/>
+        <property name="executor" ref="mrServerExecutor"/>
+        <property name="clusterType" value="rpcServer"/>
+    </bean>
+
+
+    <bean id="rpcSystemNotifyHandler" class="com.handwin.server.handler.RpcSystemNotifyHandler"/>
+
+    <bean name="exportSysMessageService" class="cn.v5.rpc.MRMessagePackInvokerServiceExporter">
+        <property name="serviceUrl" value="rpc/sysmsg"/>
+        <property name="service" ref="rpcSystemNotifyHandler"/>
+        <property name="serviceInterface" value="com.handwin.api.sysmsg.service.SysMessageService"/>
+        <property name="messagePack" ref="messagePack"/>
+        <property name="connectionManager" ref="sysRpcMrConnectionManager"/>
+        <property name="rpcServiceManager" ref="rpcServiceManager"/>
+        <property name="perfetchSize" value="512"/>
+        <property name="registry" ref="metrics"/>
+    </bean>
+
+</beans>

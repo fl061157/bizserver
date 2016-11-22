@@ -1,0 +1,39 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
+
+    <bean id="liveCrossConsumerConnectionManager" class="cn.v5.rpc.cluster.MRClusterConnectionManagerSpring">
+        <property name="group" value="${zk.group.second.livecross}"/>
+        <property name="discoverURL" value="${zk.address}"/>
+        <property name="executor" ref="mrClientExecutor"/>
+        <property name="clusterType" value="rpcClient"/>
+    </bean>
+
+    <bean id="liveCrossConsumerPublisher" class="cn.v5.mr.MRPublisherFactoryBean">
+        <property name="connectionManager" ref="liveCrossConsumerConnectionManager"/>
+        <property name="priority" value="1"/>
+    </bean>
+
+    <bean id="liveCrossConsumerClient" class="cn.v5.rpc.RpcClient">
+        <constructor-arg ref="messagePack"/>
+        <constructor-arg ref="liveCrossConsumerPublisher"/>
+        <constructor-arg ref="mrClientExecutor"/>
+        <constructor-arg value="20"/>
+        <constructor-arg ref="metrics"/>
+    </bean>
+
+    <bean id="rpcLiveChatCrossService" class="cn.v5.rpc.MRMessagePackInvokerProxyFactoryBean">
+        <property name="serviceUrl" value="rpc/livecross"/>
+        <property name="serviceInterface" value="com.handwin.server.controller.livechat.cross.LiveChatCrossService"/>
+        <property name="rpcClient" ref="liveCrossConsumerClient"/>
+    </bean>
+
+    <bean id="rpcLiveChatCrossServiceAsync" class="cn.v5.rpc.MRMessagePackInvokerProxyFactoryBean">
+        <property name="serviceUrl" value="rpc/livecross"/>
+        <property name="serviceInterface" value="com.handwin.server.controller.livechat.cross.LiveChatCrossServiceAsync"/>
+        <property name="rpcClient" ref="liveCrossConsumerClient"/>
+    </bean>
+
+
+</beans>

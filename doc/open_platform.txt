@@ -1,0 +1,12 @@
+1 tcpServer修改
+  1.1 登录接口
+      ATTR:属性字段 增加app_key。
+      BizServer返回登录响应的pb头中设置appId字段为app_key
+
+      请求携带的regionCode为第三方app申请时的appCode
+  1.2 Tcp 向BizServer发送的消息 pb头中设置appId为app_key
+      第三方app业务消息头中的appId固定为65535
+
+2 遗留
+  2.1 推送提示语，需要根据appId获取不同的内容
+  2.2 pushServer需要拿到appId才能进行推送
